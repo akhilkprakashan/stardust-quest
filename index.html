@@ -1089,13 +1089,11 @@
             });
           });
 
-          if (cloudTasks.length > 0) {
-            // Sort by createdAt descending
-            cloudTasks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-            localTasks = cloudTasks;
-            window.activeTasks = localTasks;
-            renderAllTaskViews();
-          }
+          // Always update localTasks from cloud snapshot (handles deletions, additions, updates)
+          cloudTasks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+          localTasks = cloudTasks;
+          window.activeTasks = localTasks;
+          renderAllTaskViews();
         }, (err) => {
           console.warn("Firestore listener warning:", err);
           window.showToast("Cloud sync note: Make sure your Android UID is correct.", "warning");
@@ -1279,9 +1277,9 @@
         const priorityColor = t.priority === 3 ? 'bg-red-500' : (t.priority === 2 ? 'bg-amber-400' : 'bg-blue-400');
         return `
           <div class="app-card rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-all hover:scale-[1.01] ${t.isCompleted ? 'opacity-50' : ''}">
-            <div class="flex items-center gap-3 min-w-0">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
               <span class="w-2.5 h-2.5 rounded-full ${priorityColor} shrink-0"></span>
-              <div class="min-w-0">
+              <div class="min-w-0 flex-1">
                 <h4 class="text-xs sm:text-sm font-semibold truncate ${t.isCompleted ? 'line-through text-white/60' : ''}">${t.title}</h4>
                 <div class="flex items-center gap-2 mt-0.5">
                   <span class="text-[10px] text-amber-300 font-bold">+${t.xpReward} XP</span>
@@ -1289,9 +1287,14 @@
                 </div>
               </div>
             </div>
-            <button onclick="toggleTaskComplete('${t.id}')" class="w-8 h-8 rounded-full border ${t.isCompleted ? 'accent-bg accent-border text-white' : 'border-white/20 hover:border-white/40'} flex items-center justify-center transition shrink-0">
-              ${t.isCompleted ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
-            </button>
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="toggleTaskComplete('${t.id}')" class="w-8 h-8 rounded-full border ${t.isCompleted ? 'accent-bg accent-border text-white' : 'border-white/20 hover:border-white/40'} flex items-center justify-center transition" title="Complete quest">
+                ${t.isCompleted ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
+              </button>
+              <button onclick="deleteTaskItem('${t.id}')" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-red-500/20 text-white/40 hover:text-red-400 flex items-center justify-center transition" title="Delete quest">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
           </div>
         `;
       }).join('');
