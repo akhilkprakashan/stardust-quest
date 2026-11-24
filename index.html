@@ -1186,13 +1186,13 @@
       if (currentUid) {
         try {
           const tDoc = doc(db, "users", currentUid, "tasks", String(taskId));
-          await updateDoc(tDoc, {
+          await setDoc(tDoc, {
             isCompleted: task.isCompleted,
             completedAt: task.isCompleted ? Date.now() : null,
             updatedAt: Date.now()
-          });
+          }, { merge: true });
         } catch(e) {
-          console.warn("Firestore updateDoc error:", e);
+          console.warn("Firestore setDoc toggle error:", e);
         }
       }
     };
