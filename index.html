@@ -1007,13 +1007,31 @@
     window.db = db;
     window.auth = auth;
 
+    // Centralized sorting function: uncompleted/active tasks first, newest creation time on top
+    function sortTasksList(list) {
+      if (!Array.isArray(list)) return list;
+      list.sort((a, b) => {
+        // 1. Incomplete / active tasks always come first
+        const compA = a.isCompleted ? 1 : 0;
+        const compB = b.isCompleted ? 1 : 0;
+        if (compA !== compB) return compA - compB;
+
+        // 2. Newest creation time on top (highest createdAt or id first)
+        const timeA = Number(a.createdAt) || Number(a.id) || 0;
+        const timeB = Number(b.createdAt) || Number(b.id) || 0;
+        return timeB - timeA;
+      });
+      return list;
+    }
+
     let localTasks = [
-      { id: 1732448001, title: "GeminiVoiceTask", priority: 1, xpReward: 50, isCompleted: false },
-      { id: 1732448002, title: "add my money expenditure on my app", priority: 2, xpReward: 75, isCompleted: false },
-      { id: 1732448003, title: "install the updated apk on my tablet", priority: 2, xpReward: 75, isCompleted: false },
-      { id: 1732448004, title: "Complete Weekly Boss Incursion", priority: 3, xpReward: 100, isCompleted: false },
-      { id: 1732448005, title: "Short film scene script breakdown", priority: 1, xpReward: 50, isCompleted: true }
+      { id: 1732448005, title: "Complete Weekly Boss Incursion", priority: 3, xpReward: 100, isCompleted: false, createdAt: 1732448005000 },
+      { id: 1732448004, title: "install the updated apk on my tablet", priority: 2, xpReward: 75, isCompleted: false, createdAt: 1732448004000 },
+      { id: 1732448003, title: "add my money expenditure on my app", priority: 2, xpReward: 75, isCompleted: false, createdAt: 1732448003000 },
+      { id: 1732448002, title: "GeminiVoiceTask", priority: 1, xpReward: 50, isCompleted: false, createdAt: 1732448002000 },
+      { id: 1732448001, title: "Short film scene script breakdown", priority: 1, xpReward: 50, isCompleted: true, createdAt: 1732448001000 }
     ];
+    sortTasksList(localTasks);
 
     let activeFilter = 'all';
     let currentUid = localStorage.getItem("stardust_uid") || null;
@@ -1085,12 +1103,12 @@
               priority: typeof data.priority === 'number' ? data.priority : 1,
               xpReward: data.xpReward || 50,
               isCompleted: !!data.isCompleted,
-              createdAt: data.createdAt || Date.now()
+              createdAt: Number(data.createdAt) || Number(data.id) || Date.now()
             });
           });
 
-          // Always update localTasks from cloud snapshot (handles deletions, additions, updates)
-          cloudTasks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+          // Always update localTasks from cloud snapshot, sorted with newest on top
+          sortTasksList(cloudTasks);
           localTasks = cloudTasks;
           window.activeTasks = localTasks;
           renderAllTaskViews();
@@ -1179,6 +1197,7 @@
         });
       }
 
+      sortTasksList(localTasks);
       renderAllTaskViews();
 
       if (currentUid) {
@@ -1234,6 +1253,7 @@
       };
 
       localTasks.unshift(newTask);
+      sortTasksList(localTasks);
       renderAllTaskViews();
 
       if (currentUid) {
@@ -1266,14 +1286,16 @@
     function renderHomeTasks() {
       const container = document.getElementById('homeTasksGrid');
       if (!container) return;
-      const today = localTasks.slice(0, 4);
 
-      if (today.length === 0) {
-        container.innerHTML = `<div class="col-span-full p-6 text-center app-card rounded-2xl opacity-60 text-xs">No active quests today. Launch one above!</div>`;
+      // Strict sorting: active tasks first (newest creation time on top), completed below
+      sortTasksList(localTasks);
+
+      if (localTasks.length === 0) {
+        container.innerHTML = `<div class="col-span-full p-8 text-center app-card rounded-2xl opacity-60 text-xs">No active quests today. Launch one above!</div>`;
         return;
       }
 
-      container.innerHTML = today.map(t => {
+      container.innerHTML = localTasks.map(t => {
         const priorityColor = t.priority === 3 ? 'bg-red-500' : (t.priority === 2 ? 'bg-amber-400' : 'bg-blue-400');
         return `
           <div class="app-card rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-all hover:scale-[1.01] ${t.isCompleted ? 'opacity-50' : ''}">
@@ -1305,8 +1327,10 @@
       const container = document.getElementById('fullTasksContainer');
       if (!container) return;
 
+      sortTasksList(localTasks);
+
       let filtered = localTasks;
-      if (activeFilter === 'today') filtered = localTasks.slice(0, 6);
+      if (activeFilter === 'today') filtered = localTasks;
       else if (activeFilter === 'completed') filtered = localTasks.filter(t => t.isCompleted);
       else if (activeFilter === 'pending') filtered = localTasks.filter(t => !t.isCompleted);
 
