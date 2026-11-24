@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stardust Quest - The Gamified Cosmic Command Center</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Stardust Quest — Cosmic Command Center</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,7 +15,7 @@
   <!-- Google Fonts: Space Grotesk, Inter, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -36,6 +36,7 @@
               purpleLight: '#B388FF',
               blue: '#448AFF',
               gold: '#FFD54F',
+              goldLight: '#FFE082'
             },
             slate: {
               950: '#0B0E14',
@@ -60,7 +61,7 @@
   <style>
     * {
       box-sizing: border-box;
-      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -68,25 +69,31 @@
       padding: 0;
       overflow-x: hidden;
       font-family: 'Inter', sans-serif;
-      transition: background-color 0.4s ease, color 0.4s ease;
+      transition: background 0.4s ease, color 0.4s ease;
+      min-height: 100vh;
     }
 
-    /* ── Theme 1: Cosmic Glassmorphic (AAA Sci-Fi) ── */
+    /* ── Theme 1: Cosmic Glassmorphic (AAA Sci-Fi Default) ── */
     body.theme-cosmic {
-      background-color: #0A0E1A;
+      background: linear-gradient(180deg, #130921 0%, #20103A 40%, #0A0E1A 100%);
       color: #E8EAED;
     }
     .theme-cosmic .app-card {
-      background: rgba(18, 22, 43, 0.72);
+      background: rgba(18, 22, 43, 0.75);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 8px 32px 0 rgba(124, 77, 255, 0.14);
+      box-shadow: 0 8px 32px 0 rgba(124, 77, 255, 0.12);
     }
     .theme-cosmic .app-nav {
       background: rgba(16, 19, 36, 0.94);
       backdrop-filter: blur(20px);
       border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .theme-cosmic .app-bottom-nav {
+      background: rgba(16, 19, 36, 0.92);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
     .theme-cosmic .accent-text { color: #B388FF; }
     .theme-cosmic .accent-bg { background-color: #7C4DFF; color: #FFFFFF; }
@@ -94,7 +101,7 @@
 
     /* ── Theme 2: Minimalist Clean Slate (Modern Zen) ── */
     body.theme-slate {
-      background-color: #0B0E14;
+      background: #0B0E14;
       color: #F1F5F9;
     }
     .theme-slate .app-card {
@@ -108,13 +115,18 @@
       backdrop-filter: none;
       border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
+    .theme-slate .app-bottom-nav {
+      background: #0F141E;
+      backdrop-filter: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
     .theme-slate .accent-text { color: #10B981; }
     .theme-slate .accent-bg { background-color: #10B981; color: #0B0E14; font-weight: 700; }
     .theme-slate .accent-border { border-color: #10B981; }
 
     /* ── Theme 3: Material You (Dynamic Monet) ── */
     body.theme-material {
-      background-color: #141218;
+      background: #141218;
       color: #E6E0E9;
     }
     .theme-material .app-card {
@@ -128,11 +140,16 @@
       backdrop-filter: none;
       border-right: 1px solid rgba(208, 188, 255, 0.15);
     }
+    .theme-material .app-bottom-nav {
+      background: #1D1B20;
+      backdrop-filter: none;
+      border-top: 1px solid rgba(208, 188, 255, 0.15);
+    }
     .theme-material .accent-text { color: #D0BCFF; }
     .theme-material .accent-bg { background-color: #D0BCFF; color: #381E72; font-weight: 700; }
     .theme-material .accent-border { border-color: #D0BCFF; }
 
-    /* Starfield Canvas layer */
+    /* Starfield Background Canvas */
     #spaceStarsCanvas {
       position: fixed;
       inset: 0;
@@ -140,27 +157,18 @@
       height: 100vh;
       pointer-events: none;
       z-index: 0;
-      opacity: 1;
+      opacity: 0.9;
       transition: opacity 0.5s ease;
     }
     body.hide-stars #spaceStarsCanvas {
       opacity: 0;
     }
 
-    /* Pulse Glow */
-    @keyframes pulseGlow {
-      0%, 100% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.08); opacity: 1; }
-    }
-    .sun-glow {
-      animation: pulseGlow 4s ease-in-out infinite;
-    }
-
-    /* Custom Scrollbar */
+    /* Custom Scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.35); }
   </style>
 </head>
 <body class="theme-cosmic min-h-screen flex flex-col md:flex-row antialiased selection:bg-purple-600 selection:text-white">
@@ -173,7 +181,7 @@
        ══════════════════════════════════════════════════════════════════════ -->
   <aside class="app-nav hidden md:flex flex-col items-center justify-between w-24 h-screen sticky top-0 z-40 py-6 shrink-0 transition-colors">
     <!-- Top Brand & Action Button -->
-    <div class="flex flex-col items-center gap-6">
+    <div class="flex flex-col items-center gap-6 w-full">
       <!-- Create Quest FAB (+) -->
       <button onclick="openCreateTaskModal()" title="Create New Quest"
         class="w-14 h-14 rounded-2xl accent-bg flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 group">
@@ -220,76 +228,112 @@
     </div>
 
     <!-- Bottom Sync Dot -->
-    <div class="flex flex-col items-center gap-2">
-      <div id="navSyncDot" class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.8)]" title="Firestore Real-Time Sync Active"></div>
-      <span class="text-[9px] font-mono opacity-50 uppercase tracking-widest">LIVE</span>
+    <div class="flex flex-col items-center gap-1.5 cursor-pointer" onclick="openSyncModal()" title="Click to manage Android Tablet Sync">
+      <div id="navSyncDot" class="w-3.5 h-3.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.9)] animate-pulse"></div>
+      <span class="text-[9px] font-mono opacity-60 uppercase tracking-widest font-bold">SYNC</span>
     </div>
   </aside>
 
   <!-- ══════════════════════════════════════════════════════════════════════
        MAIN CONTENT CONTAINER
        ══════════════════════════════════════════════════════════════════════ -->
-  <main class="flex-1 flex flex-col min-h-screen relative z-10 overflow-y-auto">
-    
-    <!-- Top System App Bar -->
-    <header class="app-card border-b border-white/10 sticky top-0 z-30 px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
+  <main class="flex-1 flex flex-col min-h-screen relative z-10 pb-24 md:pb-8 overflow-y-auto">
+
+    <!-- Top Connection & App Bar -->
+    <header class="app-card border-b border-white/10 sticky top-0 z-30 px-4 md:px-8 py-3 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <!-- Level Badge -->
-        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
-          <div class="w-6 h-6 rounded-lg accent-bg flex items-center justify-center text-xs font-bold font-mono">
-            7
+        <!-- Logo / Title -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl accent-bg flex items-center justify-center shadow">
+            <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
           </div>
-          <div class="text-xs">
-            <div class="font-bold flex items-center gap-1">
-              <span>LVL 7</span>
-              <span class="text-[10px] text-amber-300 font-normal">Explorer</span>
-            </div>
-            <div class="w-20 h-1.5 bg-white/10 rounded-full mt-0.5 overflow-hidden">
-              <div class="h-full accent-bg rounded-full" style="width: 35%;"></div>
-            </div>
-          </div>
+          <span class="font-display font-bold text-base tracking-tight hidden sm:inline">Stardust Quest</span>
         </div>
 
-        <div class="hidden sm:flex items-center gap-2 text-xs opacity-70">
-          <span class="px-2 py-1 rounded-md bg-white/5 border border-white/10">651 / 1852 XP</span>
-          <span class="flex items-center gap-1 text-orange-400"><i data-lucide="flame" class="w-3.5 h-3.5"></i> 3-Day Streak</span>
+        <!-- Sync Status Pill -->
+        <div onclick="openSyncModal()" id="topSyncStatusPill"
+          class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-xs font-mono cursor-pointer hover:bg-black/60 transition">
+          <span id="topSyncDot" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+          <span id="topSyncLabel" class="text-white/80">Connect Android Tablet</span>
         </div>
       </div>
 
-      <!-- Quick Sync & Theme Status -->
-      <div class="flex items-center gap-2.5">
-        <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/30 border border-white/10 text-xs">
-          <i data-lucide="cloud-lightning" class="w-3.5 h-3.5 text-emerald-400"></i>
-          <span id="headerSyncText">Android Firestore Synced</span>
-        </div>
-
-        <button onclick="switchScreen('profile')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-semibold transition">
-          <i data-lucide="palette" class="w-3.5 h-3.5 text-purple-400"></i>
-          <span class="hidden sm:inline">Theme Engine</span>
+      <!-- Quick Actions -->
+      <div class="flex items-center gap-2">
+        <button onclick="switchScreen('profile')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-semibold transition" title="Change Theme System">
+          <i data-lucide="palette" class="w-3.5 h-3.5 text-purple-300"></i>
+          <span class="hidden sm:inline">Themes</span>
         </button>
 
-        <button onclick="openSyncModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl accent-bg text-xs font-semibold shadow hover:opacity-90 transition">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+        <button onclick="openSyncModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl accent-bg text-xs font-bold shadow hover:opacity-90 active:scale-95 transition">
+          <i data-lucide="link-2" class="w-3.5 h-3.5"></i>
           <span>Sync UID</span>
         </button>
       </div>
     </header>
 
     <!-- ══════════════════════════════════════════════════════════════════════
-         SCREEN 1: HOME SCREEN (Daily Sky Solar System + Weekly Boss Fight)
+         SCREEN 1: HOME SCREEN (Exact Match to Stardust Android HomeScreen)
          ══════════════════════════════════════════════════════════════════════ -->
-    <section id="screen-home" class="screen-view p-4 md:p-8 space-y-6 max-w-6xl mx-auto w-full">
-      
-      <!-- Weekly Boss Incursion Banner -->
+    <section id="screen-home" class="screen-view p-4 md:p-8 space-y-6 max-w-5xl mx-auto w-full">
+
+      <!-- 1. Stardust Command Capsule HUD (~68dp on Android) -->
+      <div class="app-card rounded-2xl p-4 md:p-5 border border-purple-500/30 relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          
+          <!-- Left: Circular Level Emblem + Greeting + XP Track -->
+          <div class="flex items-center gap-3.5 min-w-0">
+            <!-- Level Emblem Ring -->
+            <div class="w-12 h-12 rounded-full border-2 border-amber-400 bg-purple-900/40 flex flex-col items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,213,79,0.3)]">
+              <span class="text-[8px] font-mono text-white/60 tracking-wider">LVL</span>
+              <span class="text-base font-bold font-display text-amber-300 leading-none">6</span>
+            </div>
+
+            <!-- Greeting & Motivation -->
+            <div class="min-w-0">
+              <h2 id="homeGreetingText" class="text-sm sm:text-base font-bold font-display text-white truncate">
+                Good Evening, Explorer
+              </h2>
+              <p id="homeQuoteText" class="text-xs text-white/70 italic truncate">
+                Finish strong. One more task can change your universe.
+              </p>
+              
+              <!-- Slim XP Progress Bar -->
+              <div class="flex items-center gap-2 mt-1.5">
+                <div class="w-28 sm:w-36 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-amber-400 to-purple-500 rounded-full" style="width: 35%;"></div>
+                </div>
+                <span class="text-[10px] font-mono text-white/60">651 / 1852 XP</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Streak Pill + Oracle Chronicle Button -->
+          <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+            <!-- Streak Pill -->
+            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-bold text-amber-400">
+              <span>🔥</span>
+              <span>2 Days</span>
+            </div>
+
+            <!-- Oracle Button -->
+            <button onclick="triggerOracleModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 border border-purple-400/50 text-xs font-bold text-purple-200 transition shadow">
+              <span>✨ Ask Oracle</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Weekly Boss Incursion Banner (Abyssalis - The Entropy Singularity) -->
       <div class="app-card rounded-3xl p-5 md:p-6 border border-amber-500/30 relative overflow-hidden group">
         <div class="absolute -right-16 -top-16 w-56 h-56 bg-gradient-to-br from-amber-500/20 to-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative z-10">
           <div class="flex items-center gap-4">
-            <!-- Boss Animated Avatar / Crest -->
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-600/40 via-purple-700/50 to-amber-400/40 border border-amber-400/50 flex items-center justify-center shadow-lg relative shrink-0">
-              <i data-lucide="shield-alert" class="w-8 h-8 text-amber-300"></i>
-              <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white border border-black">
+            <!-- Boss Crest Avatar -->
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-800 to-amber-600/60 border border-amber-400/50 flex items-center justify-center shadow-lg relative shrink-0">
+              <i data-lucide="shield-alert" class="w-7 h-7 text-amber-300"></i>
+              <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-red-600 flex items-center justify-center text-[9px] font-bold text-white border border-black">
                 !
               </div>
             </div>
@@ -299,18 +343,18 @@
                 <span class="text-[11px] font-mono uppercase font-bold text-amber-400 tracking-wider">WEEKLY BOSS INCURSION</span>
                 <span class="text-[10px] px-2 py-0.5 rounded-full bg-white/10 border border-white/10 opacity-70">5d left</span>
               </div>
-              <h2 class="text-xl md:text-2xl font-bold font-display tracking-tight text-white mt-0.5">
-                Chronos — The Sloth Titan
-              </h2>
-              <p class="text-xs opacity-70 mt-0.5">Complete quests to charge your meteor strike cannon and repel the incursion!</p>
+              <h3 class="text-lg md:text-xl font-bold font-display tracking-tight text-white mt-0.5">
+                Abyssalis — The Entropy Singularity
+              </h3>
+              <p class="text-xs text-white/70 mt-0.5">Vanquish the singularity by clearing your quests and launching meteor strikes!</p>
             </div>
           </div>
 
           <!-- Boss HP & Battle Action -->
-          <div class="w-full md:w-auto flex flex-col sm:flex-row items-center gap-4">
-            <div class="w-full sm:w-48 text-right">
+          <div class="w-full md:w-auto flex flex-col sm:flex-row items-center gap-3.5">
+            <div class="w-full sm:w-44 text-right">
               <div class="flex justify-between text-xs font-semibold mb-1">
-                <span class="text-amber-300 font-mono" id="bossHpText">600 / 600 HP</span>
+                <span class="text-amber-300 font-mono" id="bossHpText">750 / 750 HP</span>
                 <span class="text-amber-400 font-bold" id="bossPercentText">100%</span>
               </div>
               <div class="w-full h-2.5 bg-black/40 rounded-full overflow-hidden border border-white/10 p-0.5">
@@ -318,7 +362,7 @@
               </div>
             </div>
 
-            <button onclick="openBossBattleModal()" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-purple-600 hover:from-amber-400 hover:to-purple-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 transition">
+            <button onclick="openBossBattleModal()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-purple-600 hover:from-amber-400 hover:to-purple-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 transition">
               <i data-lucide="crosshair" class="w-4 h-4"></i>
               <span>Meteor Slingshot</span>
             </button>
@@ -326,18 +370,22 @@
         </div>
       </div>
 
-      <!-- ─── THE DYNAMIC LIVING SOLAR SYSTEM CANVAS (DailySkyBackground) ─── -->
+      <!-- 3. Dynamic Living Solar System Observatory (DailySky Canvas) -->
       <div class="app-card rounded-3xl p-4 md:p-6 relative overflow-hidden">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
             <i data-lucide="orbit" class="w-4 h-4 text-purple-400"></i>
             <h3 class="text-sm font-bold font-display uppercase tracking-wider">Cosmic Solar Observatory</h3>
           </div>
-          <span class="text-xs opacity-60">Planets orbit based on tasks completed</span>
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 font-medium border border-purple-500/30">
+              Next: Mercury (2 left)
+            </span>
+          </div>
         </div>
 
         <!-- Solar System Canvas Container -->
-        <div class="relative w-full h-[320px] md:h-[400px] rounded-2xl overflow-hidden bg-gradient-to-b from-[#060814] via-[#090D22] to-[#060814] border border-white/10 flex items-center justify-center">
+        <div class="relative w-full h-[280px] md:h-[360px] rounded-2xl overflow-hidden bg-gradient-to-b from-[#050713] via-[#090D24] to-[#050713] border border-white/10 flex items-center justify-center cursor-pointer" onclick="toggleSpaceView()">
           <canvas id="solarSystemCanvas" class="w-full h-full"></canvas>
 
           <!-- Floating Info Pills over Canvas -->
@@ -347,35 +395,56 @@
               Sol Primus (Sun)
             </span>
             <span class="text-[10px] px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white/80">
-              3 Orbiting Worlds
+              Revolving Planetary Orbits
             </span>
           </div>
 
           <div class="absolute top-3 right-4 pointer-events-none">
             <span class="text-[10px] px-2.5 py-1 rounded-full bg-purple-900/60 backdrop-blur-md border border-purple-400/30 text-purple-200 flex items-center gap-1.5">
-              <i data-lucide="disc" class="w-3 h-3 text-purple-400"></i>
-              Outer Anomaly Void Rift
+              <i data-lucide="maximize-2" class="w-3 h-3 text-purple-400"></i>
+              Interactive Space View
             </span>
           </div>
         </div>
       </div>
 
-      <!-- Today's Quests Row -->
+      <!-- 4. Today's Quests Section -->
       <div class="space-y-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <i data-lucide="calendar" class="w-4 h-4 accent-text"></i>
-            <h3 class="text-base font-bold font-display">Today's Quests</h3>
-            <span id="activeCountBadge" class="text-xs px-2 py-0.5 rounded-full bg-white/10 font-mono">0 active</span>
+            <h3 class="text-base font-bold font-display">Today's Tasks</h3>
+            <span id="activeCountBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-white/10 font-mono text-purple-300">0 active</span>
           </div>
           <button onclick="openCreateTaskModal()" class="text-xs accent-text hover:underline font-semibold flex items-center gap-1">
             <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-            <span>Add Quest</span>
+            <span>Add Task</span>
           </button>
         </div>
 
+        <!-- Quick Deploy Quest Input -->
+        <div class="app-card p-2 rounded-2xl flex items-center gap-2.5 border border-white/10">
+          <i data-lucide="crosshair" class="w-4 h-4 ml-2 opacity-50"></i>
+          <input type="text" id="homeQuestInput" placeholder="Launch a new mission... (Enter to deploy)" 
+            class="bg-transparent border-none text-xs sm:text-sm px-2 py-2 flex-1 focus:outline-none placeholder-white/40"
+            onkeydown="if(event.key === 'Enter') createHomeQuestDirect()">
+          
+          <select id="homeQuestPriority" class="bg-black/40 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none text-white/80">
+            <option value="1">Medium</option>
+            <option value="2">High</option>
+            <option value="3">Urgent</option>
+            <option value="0">Low</option>
+          </select>
+
+          <button onclick="createHomeQuestDirect()" class="accent-bg px-4 py-2 rounded-xl text-xs font-bold shadow hover:opacity-90 active:scale-95 transition flex items-center gap-1 shrink-0">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Deploy</span>
+          </button>
+        </div>
+
+        <!-- Tasks Grid Container -->
         <div id="homeTasksGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-          <!-- Populated dynamically -->
+          <!-- Populated dynamically via JS -->
         </div>
       </div>
     </section>
@@ -399,29 +468,9 @@
         </div>
       </div>
 
-      <!-- Quick Add Input -->
-      <div class="app-card p-2.5 rounded-2xl flex items-center gap-3">
-        <i data-lucide="crosshair" class="w-5 h-5 ml-2 opacity-50"></i>
-        <input type="text" id="questInput" placeholder="Launch a new mission... (press Enter to sync to Android)" 
-          class="bg-transparent border-none text-sm px-2 py-2 flex-1 focus:outline-none placeholder-white/40"
-          onkeydown="if(event.key === 'Enter') createQuestDirect()">
-        
-        <select id="questPriority" class="bg-black/30 border border-white/10 rounded-xl px-3 py-1.5 text-xs focus:outline-none">
-          <option value="1">Medium</option>
-          <option value="2">High</option>
-          <option value="3">Urgent</option>
-          <option value="0">Low</option>
-        </select>
-
-        <button onclick="createQuestDirect()" class="accent-bg px-4 py-2 rounded-xl text-xs font-bold shadow hover:opacity-90 active:scale-95 transition flex items-center gap-1.5">
-          <i data-lucide="plus" class="w-4 h-4"></i>
-          <span>Deploy</span>
-        </button>
-      </div>
-
       <!-- Tasks List -->
       <div id="fullTasksContainer" class="space-y-3">
-        <!-- Injected via JS -->
+        <!-- Injected dynamically -->
       </div>
     </section>
 
@@ -458,7 +507,7 @@
           </div>
         </div>
 
-        <!-- Planet 2: Aphrodite / Venus -->
+        <!-- Planet 2: Venus / Cytherea -->
         <div class="app-card rounded-3xl p-5 border border-white/10 flex flex-col justify-between">
           <div>
             <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-700 via-amber-500 to-yellow-200 shadow-[0_0_20px_rgba(245,158,11,0.4)] mb-4 flex items-center justify-center">
@@ -476,7 +525,7 @@
           </div>
         </div>
 
-        <!-- Planet 3: Gaia / Earth -->
+        <!-- Planet 3: Earth / Terra Gaia -->
         <div class="app-card rounded-3xl p-5 border border-white/10 flex flex-col justify-between">
           <div>
             <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-700 via-teal-500 to-emerald-300 shadow-[0_0_24px_rgba(20,184,166,0.5)] mb-4 flex items-center justify-center">
@@ -493,23 +542,6 @@
             <span>Period: 365 days</span>
           </div>
         </div>
-
-        <!-- Planet 4: Locked / Ares -->
-        <div class="app-card rounded-3xl p-5 border border-white/5 opacity-60 flex flex-col justify-between">
-          <div>
-            <div class="w-14 h-14 rounded-full bg-white/5 border border-white/10 mb-4 flex items-center justify-center">
-              <i data-lucide="lock" class="w-5 h-5 text-white/40"></i>
-            </div>
-            <div class="flex items-center justify-between">
-              <h3 class="font-display font-bold text-lg text-white/70">Ares (Mars)</h3>
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/60">Need 50 Tasks</span>
-            </div>
-            <p class="text-xs opacity-60 mt-1">Crimson dunes and Olympus Mons. Unlock by completing 17 more tasks.</p>
-          </div>
-          <div class="mt-4 pt-3 border-t border-white/10 text-[11px] font-mono opacity-40">
-            Progress: 33 / 50 Tasks Completed
-          </div>
-        </div>
       </div>
     </section>
 
@@ -522,10 +554,6 @@
           <h2 class="text-2xl font-bold font-display tracking-tight">Skill Mastery Tree</h2>
           <p class="text-xs opacity-70">XP accumulated across disciplines via task completion</p>
         </div>
-        <button onclick="alert('Creating custom skills will sync directly with your Android app!')" class="accent-bg px-4 py-2 rounded-xl text-xs font-bold shadow hover:opacity-90 flex items-center gap-1.5">
-          <i data-lucide="plus" class="w-4 h-4"></i>
-          <span>New Skill</span>
-        </button>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -598,26 +626,27 @@
     </section>
 
     <!-- ══════════════════════════════════════════════════════════════════════
-         SCREEN 5: PROFILE SCREEN (Stats, Relics, & FULL UI SYSTEM SWITCHER)
+         SCREEN 5: PROFILE SCREEN (Stats, Cloud Sync, & UI Systems)
          ══════════════════════════════════════════════════════════════════════ -->
     <section id="screen-profile" class="screen-view hidden p-4 md:p-8 space-y-6 max-w-4xl mx-auto w-full">
+      
       <!-- Profile Header / Level -->
       <div class="app-card rounded-3xl p-6 text-center relative overflow-hidden">
         <div class="w-24 h-24 mx-auto rounded-full border-4 accent-border flex items-center justify-center mb-3 shadow-[0_0_30px_rgba(124,77,255,0.3)]">
           <div>
-            <div class="text-2xl font-bold font-display">LVL 7</div>
+            <div class="text-2xl font-bold font-display">LVL 6</div>
             <div class="text-[10px] opacity-70 font-mono">651/1852 XP</div>
           </div>
         </div>
         <h2 class="text-2xl font-bold font-display tracking-tight">Explorer</h2>
-        <p class="text-xs opacity-70">Command Station realtime status</p>
+        <p class="text-xs opacity-70">Stardust Command Station</p>
 
         <!-- Stats Grid (Identical to Android Profile StatCard) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-6">
           <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-center">
             <i data-lucide="flame" class="w-5 h-5 mx-auto text-red-400 mb-1"></i>
-            <div class="text-lg font-bold font-display">3 Days</div>
-            <span class="text-[10px] opacity-60">Best Streak</span>
+            <div class="text-lg font-bold font-display">2 Days</div>
+            <span class="text-[10px] opacity-60">Streak</span>
           </div>
           <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-center">
             <i data-lucide="check-circle" class="w-5 h-5 mx-auto text-emerald-400 mb-1"></i>
@@ -627,7 +656,7 @@
           <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-center">
             <i data-lucide="timer" class="w-5 h-5 mx-auto text-blue-400 mb-1"></i>
             <div class="text-lg font-bold font-display">0m</div>
-            <span class="text-[10px] opacity-60">Total Focus</span>
+            <span class="text-[10px] opacity-60">Focus Time</span>
           </div>
           <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-center">
             <i data-lucide="sparkles" class="w-5 h-5 mx-auto text-amber-300 mb-1"></i>
@@ -637,7 +666,36 @@
         </div>
       </div>
 
-      <!-- ─── THE NEW INTERFACE UI SYSTEM SELECTOR (Matching Android ProfileScreen) ─── -->
+      <!-- Cloud Sync & Android Tablet Pairing Card -->
+      <div class="app-card rounded-3xl p-6 border border-white/10 space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center">
+              <i data-lucide="cloud-lightning" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-base">Android Tablet Real-Time Sync</h3>
+              <p class="text-xs opacity-70">Bidirectional cloud synchronization via Firebase Firestore</p>
+            </div>
+          </div>
+          <span id="profileSyncBadge" class="text-xs px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold">
+            NOT CONNECTED
+          </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <span class="opacity-70">Current Web Sync UID:</span>
+            <span id="currentUidDisplay" class="font-mono text-purple-300 font-bold break-all">None</span>
+          </div>
+          <button onclick="openSyncModal()" class="w-full py-2.5 rounded-xl accent-bg font-bold text-xs flex items-center justify-center gap-1.5 shadow">
+            <i data-lucide="link" class="w-4 h-4"></i>
+            <span>Pair Android UID</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ─── INTERFACE UI SYSTEM SELECTOR (Matching Android ProfileScreen) ─── -->
       <div class="app-card rounded-3xl p-6 border border-white/10">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-10 h-10 rounded-2xl accent-bg flex items-center justify-center">
@@ -649,9 +707,7 @@
           </div>
         </div>
 
-        <!-- 3 System Selector Cards -->
         <div class="space-y-3.5">
-          
           <!-- System 1: Cosmic Glassmorphic -->
           <div onclick="setTheme('cosmic')" id="card-cosmic"
             class="rounded-2xl p-4 border border-purple-500/40 bg-purple-500/10 cursor-pointer transition-all hover:border-purple-400">
@@ -668,13 +724,6 @@
               <div id="check-cosmic" class="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs">
                 <i data-lucide="check" class="w-3.5 h-3.5"></i>
               </div>
-            </div>
-
-            <!-- Cosmic Colorways -->
-            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-white/10 text-xs">
-              <span class="px-2.5 py-1 rounded-lg bg-purple-600/30 text-purple-300 border border-purple-500/30 font-semibold">Cosmic Dark</span>
-              <span class="px-2.5 py-1 rounded-lg bg-pink-600/20 text-pink-300 border border-pink-500/20">Nebula Rose</span>
-              <span class="px-2.5 py-1 rounded-lg bg-cyan-600/20 text-cyan-300 border border-cyan-500/20">Deep Ocean</span>
             </div>
           </div>
 
@@ -695,11 +744,6 @@
                 <i data-lucide="check" class="w-3.5 h-3.5"></i>
               </div>
             </div>
-
-            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-white/10 text-xs">
-              <span class="px-2.5 py-1 rounded-lg bg-violet-500/20 text-violet-200 border border-violet-500/30 font-semibold">Dynamic Dark</span>
-              <span class="px-2.5 py-1 rounded-lg bg-violet-300/10 text-violet-300 border border-white/10">Dynamic Light</span>
-            </div>
           </div>
 
           <!-- System 3: Minimalist Clean Slate -->
@@ -719,20 +763,42 @@
                 <i data-lucide="check" class="w-3.5 h-3.5"></i>
               </div>
             </div>
-
-            <!-- Slate Swatches -->
-            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-white/10 text-[11px] font-mono">
-              <span class="px-2.5 py-1 rounded-md bg-[#0B0E14] text-white border border-white/10">Obsidian #0B0E14</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#151922] text-white border border-white/10">Charcoal #151922</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#10B981]/20 text-emerald-400 border border-[#10B981]/30 font-bold">Mint #10B981</span>
-            </div>
           </div>
-
         </div>
       </div>
     </section>
 
   </main>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       MOBILE BOTTOM NAVIGATION BAR (Identical to Stardust BottomBar)
+       ══════════════════════════════════════════════════════════════════════ -->
+  <nav class="app-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-40 px-3 py-2 flex items-center justify-around transition-colors">
+    <button onclick="switchScreen('home')" id="mob-btn-home" class="flex flex-col items-center gap-0.5 text-purple-300">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">Home</span>
+    </button>
+
+    <button onclick="switchScreen('tasks')" id="mob-btn-tasks" class="flex flex-col items-center gap-0.5 opacity-60">
+      <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+      <span class="text-[10px] font-medium">Tasks</span>
+    </button>
+
+    <!-- Center Floating Action Button (+) -->
+    <button onclick="openCreateTaskModal()" class="w-12 h-12 -mt-5 rounded-full accent-bg flex items-center justify-center shadow-lg active:scale-95 transition">
+      <i data-lucide="plus" class="w-6 h-6 text-white"></i>
+    </button>
+
+    <button onclick="switchScreen('cosmos')" id="mob-btn-cosmos" class="flex flex-col items-center gap-0.5 opacity-60">
+      <i data-lucide="sparkles" class="w-5 h-5"></i>
+      <span class="text-[10px] font-medium">Cosmos</span>
+    </button>
+
+    <button onclick="switchScreen('profile')" id="mob-btn-profile" class="flex flex-col items-center gap-0.5 opacity-60">
+      <i data-lucide="user" class="w-5 h-5"></i>
+      <span class="text-[10px] font-medium">Profile</span>
+    </button>
+  </nav>
 
   <!-- ══════════════════════════════════════════════════════════════════════
        INTERACTIVE BOSS SLINGSHOT MINI-GAME MODAL
@@ -744,7 +810,7 @@
         <div class="flex items-center gap-2.5">
           <i data-lucide="swords" class="w-5 h-5 text-amber-400"></i>
           <div>
-            <h3 class="font-display font-bold text-base">Orbital Strike Defense — Chronos</h3>
+            <h3 class="font-display font-bold text-base">Orbital Strike Defense — Abyssalis</h3>
             <span class="text-xs opacity-60">Pull the slingshot back and release to fire meteors!</span>
           </div>
         </div>
@@ -754,10 +820,9 @@
       </div>
 
       <!-- Slingshot Canvas Arena -->
-      <div class="relative w-full h-[380px] bg-gradient-to-b from-[#0B0616] via-[#120826] to-[#0A0E1A]">
+      <div class="relative w-full h-[360px] bg-gradient-to-b from-[#0B0616] via-[#120826] to-[#0A0E1A]">
         <canvas id="slingshotCanvas" class="w-full h-full cursor-crosshair"></canvas>
         
-        <!-- Score overlay -->
         <div class="absolute top-4 left-4 pointer-events-none flex items-center gap-3">
           <div class="px-3 py-1.5 rounded-xl bg-black/60 border border-white/10 text-xs font-mono">
             Hits: <span id="bossHitCount" class="text-amber-400 font-bold">0</span>
@@ -769,7 +834,7 @@
 
         <div class="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
           <span class="text-xs px-3 py-1.5 rounded-full bg-black/70 border border-white/20 text-white/80">
-            🖱️ Drag meteor inside the launcher and release to fire!
+            🖱️ Pull meteor inside the launcher and release to strike!
           </span>
         </div>
       </div>
@@ -777,9 +842,37 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════════════
+       ORACLE CHRONICLE MODAL
+       ══════════════════════════════════════════════════════════════════════ -->
+  <div id="oracleModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="app-card rounded-3xl w-full max-w-lg p-6 border border-purple-500/40 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">✨</span>
+          <h3 class="font-display font-bold text-lg">Oracle Weekly Voyage Summary</h3>
+        </div>
+        <button onclick="closeOracleModal()" class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-purple-900/20 border border-purple-500/30 text-xs sm:text-sm text-purple-100 leading-relaxed space-y-2">
+        <p class="font-semibold text-amber-300">Commander, your celestial orbit grows stronger.</p>
+        <p>Across the past solar cycles, your discipline has vanquished chaos in the cosmos. Hermea, Cytherea, and Terra Gaia orbit safely in harmonic resonance. Every quest you complete ignites further cosmic energy to repel incursion threats!</p>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button onclick="closeOracleModal()" class="accent-bg px-5 py-2 rounded-xl text-xs font-bold shadow hover:opacity-90">
+          Acknowledge Chronicle
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
        CREATE QUEST MODAL
        ══════════════════════════════════════════════════════════════════════ -->
-  <div id="createTaskModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
+  <div id="createTaskModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md hidden flex items-center justify-center p-4">
     <div class="app-card rounded-3xl w-full max-w-md p-6 border border-white/15 shadow-2xl space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="font-display font-bold text-lg">Create New Quest</h3>
@@ -822,35 +915,52 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════════════
-       SYNC UID MODAL
+       SYNC UID MODAL (Frictionless Android Tablet Connection)
        ══════════════════════════════════════════════════════════════════════ -->
-  <div id="syncModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md hidden flex items-center justify-center p-4">
-    <div class="app-card rounded-3xl w-full max-w-md p-6 border border-white/15 shadow-2xl space-y-4">
+  <div id="syncModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="app-card rounded-3xl w-full max-w-md p-6 border border-purple-500/40 shadow-2xl space-y-4">
       <div class="flex items-center justify-between">
-        <h3 class="font-display font-bold text-lg">Connect Android Tablet</h3>
+        <div class="flex items-center gap-2">
+          <i data-lucide="smartphone" class="w-5 h-5 text-purple-400"></i>
+          <h3 class="font-display font-bold text-lg">Connect Android Tablet</h3>
+        </div>
         <button onclick="closeSyncModal()" class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <p class="text-xs opacity-70">
-        Enter your User UID from the Stardust Quest Android app Profile screen to sync tasks, progress, and skills directly in real-time.
-      </p>
+      <div class="p-3.5 rounded-2xl bg-purple-900/20 border border-purple-500/30 text-xs text-purple-200 leading-relaxed">
+        <p class="font-bold mb-1">📲 How to find your Android UID:</p>
+        <ol class="list-decimal list-inside space-y-0.5 opacity-90">
+          <li>Open Stardust Quest on your Android tablet or phone.</li>
+          <li>Tap the <strong>Profile</strong> tab on the bottom/side.</li>
+          <li>Under <strong>Web & Cloud Sync</strong>, tap <strong>"Copy UID"</strong>.</li>
+          <li>Paste that UID in the box below to connect instantly!</li>
+        </ol>
+      </div>
 
-      <input type="text" id="uidInputBox" placeholder="Paste Android User UID here..."
-        class="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs font-mono focus:outline-none focus:border-purple-400">
+      <div class="space-y-1.5">
+        <label class="text-xs opacity-70 block">Android User UID</label>
+        <input type="text" id="uidInputBox" placeholder="Paste UID here (e.g. 5xY9A...)"
+          class="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/20 text-xs font-mono focus:outline-none focus:border-purple-400">
+      </div>
 
       <div class="flex items-center justify-between pt-2">
         <button onclick="loginWithGoogle()" class="px-3.5 py-2 rounded-xl bg-white/10 text-xs font-semibold hover:bg-white/20 flex items-center gap-1.5">
           <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
-          <span>Google Login</span>
+          <span>Google Sign-In</span>
         </button>
         <button onclick="applyManualUid()" class="accent-bg px-5 py-2 rounded-xl text-xs font-bold shadow hover:opacity-90">
-          Connect & Sync
+          Connect & Sync Now
         </button>
       </div>
     </div>
   </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       TOAST NOTIFICATION CONTAINER
+       ══════════════════════════════════════════════════════════════════════ -->
+  <div id="toastContainer" class="fixed bottom-20 md:bottom-6 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- ══════════════════════════════════════════════════════════════════════
        FIREBASE INTEGRATION SCRIPT & STATE STORE
@@ -874,7 +984,6 @@
       onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    // Pre-wired to your Stardust Android project
     const firebaseConfig = {
       apiKey: "AIzaSyCMFCCMYTSvRHsK5x4VCqyqHoIjwF27Z5k",
       authDomain: "stardustquest-af2a8.firebaseapp.com",
@@ -892,28 +1001,115 @@
     window.db = db;
     window.auth = auth;
 
-    // Default sample data matching user's real app until cloud sync
     let localTasks = [
-      { id: "1", title: "GeminiVoiceTask", priority: 1, xpReward: 50, isCompleted: false },
-      { id: "2", title: "add my money expenditure on my app", priority: 2, xpReward: 75, isCompleted: false },
-      { id: "3", title: "install the updated apk on my tablet", priority: 2, xpReward: 75, isCompleted: false },
-      { id: "4", title: "Complete Weekly Boss Incursion", priority: 3, xpReward: 100, isCompleted: false },
-      { id: "5", title: "Short film scene script breakdown", priority: 1, xpReward: 50, isCompleted: true }
+      { id: 1732448001, title: "GeminiVoiceTask", priority: 1, xpReward: 50, isCompleted: false },
+      { id: 1732448002, title: "add my money expenditure on my app", priority: 2, xpReward: 75, isCompleted: false },
+      { id: 1732448003, title: "install the updated apk on my tablet", priority: 2, xpReward: 75, isCompleted: false },
+      { id: 1732448004, title: "Complete Weekly Boss Incursion", priority: 3, xpReward: 100, isCompleted: false },
+      { id: 1732448005, title: "Short film scene script breakdown", priority: 1, xpReward: 50, isCompleted: true }
     ];
 
     let activeFilter = 'all';
     let currentUid = localStorage.getItem("stardust_uid") || null;
+    let unsubscribeFirestore = null;
 
-    window.activeTasks = localTasks;
+    window.showToast = (message, type = 'info') => {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `px-4 py-2.5 rounded-2xl backdrop-blur-md shadow-xl text-xs font-semibold flex items-center gap-2 border transition-all duration-300 pointer-events-auto ${
+        type === 'success' ? 'bg-emerald-900/90 border-emerald-400/40 text-emerald-200' :
+        (type === 'warning' ? 'bg-amber-900/90 border-amber-400/40 text-amber-200' : 'bg-purple-900/90 border-purple-400/40 text-purple-200')
+      }`;
+      toast.innerHTML = `<span>${type === 'success' ? '✓' : (type === 'warning' ? '⚠️' : '⚡')}</span><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    };
+
+    function updateSyncUI(uid) {
+      const topDot = document.getElementById('topSyncDot');
+      const topLabel = document.getElementById('topSyncLabel');
+      const navDot = document.getElementById('navSyncDot');
+      const profileBadge = document.getElementById('profileSyncBadge');
+      const currentUidDisplay = document.getElementById('currentUidDisplay');
+
+      if (uid) {
+        if (topDot) topDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.9)]";
+        if (topLabel) topLabel.textContent = `Synced: ${uid.slice(0, 6)}...`;
+        if (navDot) navDot.className = "w-3.5 h-3.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.9)] animate-pulse";
+        if (profileBadge) {
+          profileBadge.className = "text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono font-bold";
+          profileBadge.textContent = "CONNECTED (LIVE SYNC)";
+        }
+        if (currentUidDisplay) currentUidDisplay.textContent = uid;
+      } else {
+        if (topDot) topDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
+        if (topLabel) topLabel.textContent = "Connect Android Tablet";
+        if (navDot) navDot.className = "w-3.5 h-3.5 rounded-full bg-amber-400";
+        if (profileBadge) {
+          profileBadge.className = "text-xs px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold";
+          profileBadge.textContent = "NOT CONNECTED";
+        }
+        if (currentUidDisplay) currentUidDisplay.textContent = "None (Offline local mode)";
+      }
+    }
+
+    function initFirestoreSync(uid) {
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+        unsubscribeFirestore = null;
+      }
+
+      updateSyncUI(uid);
+
+      try {
+        const tasksCol = collection(db, "users", uid, "tasks");
+        const q = query(tasksCol);
+        unsubscribeFirestore = onSnapshot(q, (snapshot) => {
+          const cloudTasks = [];
+          snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            cloudTasks.push({
+              id: data.id || Number(docSnap.id) || docSnap.id,
+              title: data.title || "Untitled Mission",
+              priority: typeof data.priority === 'number' ? data.priority : 1,
+              xpReward: data.xpReward || 50,
+              isCompleted: !!data.isCompleted,
+              createdAt: data.createdAt || Date.now()
+            });
+          });
+
+          if (cloudTasks.length > 0) {
+            // Sort by createdAt descending
+            cloudTasks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            localTasks = cloudTasks;
+            window.activeTasks = localTasks;
+            renderAllTaskViews();
+          }
+        }, (err) => {
+          console.warn("Firestore listener warning:", err);
+          window.showToast("Cloud sync note: Make sure your Android UID is correct.", "warning");
+        });
+      } catch (err) {
+        console.error("Firestore init error:", err);
+      }
+    }
 
     window.applyManualUid = () => {
       const val = document.getElementById('uidInputBox').value.trim();
-      if (!val) return;
+      if (!val) {
+        alert("Please paste your Android User UID from the Stardust Profile screen.");
+        return;
+      }
       currentUid = val;
       localStorage.setItem("stardust_uid", val);
-      document.getElementById('headerSyncText').textContent = "UID: " + val.slice(0, 6) + "...";
       closeSyncModal();
       initFirestoreSync(val);
+      window.showToast("Connected to Android UID! Syncing live...", "success");
     };
 
     window.loginWithGoogle = async () => {
@@ -921,38 +1117,25 @@
         const res = await signInWithPopup(auth, provider);
         currentUid = res.user.uid;
         localStorage.setItem("stardust_uid", currentUid);
-        document.getElementById('headerSyncText').textContent = res.user.displayName || "Google User";
         closeSyncModal();
         initFirestoreSync(currentUid);
+        window.showToast(`Signed in as ${res.user.displayName || 'Google User'}!`, "success");
       } catch (e) {
-        alert("Google Login: " + e.message);
+        alert("Google Sign-In note: " + e.message + "\n\nTip: You can also directly paste your Android UID!");
       }
     };
 
-    function initFirestoreSync(uid) {
-      const q = query(collection(db, "users", uid, "tasks"));
-      onSnapshot(q, (snapshot) => {
-        const cloudTasks = [];
-        snapshot.forEach(d => cloudTasks.push({ id: d.id, ...d.data() }));
-        if (cloudTasks.length > 0) {
-          localTasks = cloudTasks;
-          window.activeTasks = localTasks;
-          renderAllTaskViews();
-        }
-      });
-    }
-
     if (currentUid) {
-      document.getElementById('headerSyncText').textContent = "UID: " + currentUid.slice(0, 6) + "...";
       initFirestoreSync(currentUid);
+    } else {
+      updateSyncUI(null);
     }
 
     window.toggleTaskComplete = async (taskId) => {
-      const task = localTasks.find(t => t.id === taskId);
+      const task = localTasks.find(t => t.id == taskId);
       if (!task) return;
       task.isCompleted = !task.isCompleted;
 
-      // Confetti celebration
       if (task.isCompleted) {
         confetti({
           particleCount: 50,
@@ -965,45 +1148,69 @@
 
       if (currentUid) {
         try {
-          const tDoc = doc(db, "users", currentUid, "tasks", taskId);
+          const tDoc = doc(db, "users", currentUid, "tasks", String(taskId));
           await updateDoc(tDoc, {
             isCompleted: task.isCompleted,
-            completedAt: task.isCompleted ? Date.now() : null
+            completedAt: task.isCompleted ? Date.now() : null,
+            updatedAt: Date.now()
           });
         } catch(e) {
-          console.warn("Local updated; cloud sync requires valid UID.");
+          console.warn("Firestore updateDoc error:", e);
         }
       }
     };
 
     window.deleteTaskItem = async (taskId) => {
-      localTasks = localTasks.filter(t => t.id !== taskId);
-      window.activeTasks = localTasks;
+      localTasks = localTasks.filter(t => t.id != taskId);
       renderAllTaskViews();
       if (currentUid) {
         try {
-          await deleteDoc(doc(db, "users", currentUid, "tasks", taskId));
-        } catch(e) {}
+          await deleteDoc(doc(db, "users", currentUid, "tasks", String(taskId)));
+          window.showToast("Quest deleted from tablet.", "info");
+        } catch(e) {
+          console.warn("Firestore deleteDoc error:", e);
+        }
       }
     };
 
     window.createNewQuest = async (title, priority) => {
+      const now = Date.now();
+      const pNum = parseInt(priority, 10);
+      const xp = pNum === 3 ? 100 : (pNum === 2 ? 75 : 50);
+
+      // Exact format matching Android TaskEntity!
       const newTask = {
-        id: String(Date.now()),
+        id: now,
         title: title,
-        priority: parseInt(priority, 10),
-        xpReward: priority == 3 ? 100 : (priority == 2 ? 75 : 50),
+        description: null,
+        categoryId: null,
+        skillId: null,
+        priority: pNum,
+        xpReward: xp,
+        dueDate: null,
+        reminderTime: null,
         isCompleted: false,
-        createdAt: Date.now()
+        isPending: false,
+        completedAt: null,
+        createdAt: now,
+        updatedAt: now,
+        sortOrder: 0,
+        recurrenceType: null
       };
+
       localTasks.unshift(newTask);
-      window.activeTasks = localTasks;
       renderAllTaskViews();
 
       if (currentUid) {
         try {
-          await setDoc(doc(db, "users", currentUid, "tasks", newTask.id), newTask);
-        } catch(e) {}
+          await setDoc(doc(db, "users", currentUid, "tasks", String(now)), newTask);
+          window.showToast(`Quest deployed to Android tablet! (+${xp} XP)`, "success");
+        } catch(e) {
+          console.error("Firestore setDoc error:", e);
+          window.showToast("Added locally. Check Firestore permissions or UID.", "warning");
+        }
+      } else {
+        window.showToast("Saved locally! Tap 'Sync UID' at the top to sync to Android.", "warning");
       }
     };
 
@@ -1026,20 +1233,31 @@
       if (!container) return;
       const today = localTasks.slice(0, 4);
 
-      container.innerHTML = today.map(t => `
-        <div class="app-card rounded-2xl p-4 flex items-center justify-between gap-3 transition-all hover:scale-[1.01] ${t.isCompleted ? 'opacity-50' : ''}">
-          <div class="flex items-center gap-3 min-w-0">
-            <span class="w-2.5 h-2.5 rounded-full ${t.priority === 3 ? 'bg-red-400' : (t.priority === 2 ? 'bg-amber-400' : 'bg-blue-400')} shrink-0"></span>
-            <div class="min-w-0">
-              <h4 class="text-sm font-semibold truncate ${t.isCompleted ? 'line-through' : ''}">${t.title}</h4>
-              <span class="text-[10px] text-amber-300 font-bold">+${t.xpReward} XP</span>
+      if (today.length === 0) {
+        container.innerHTML = `<div class="col-span-full p-6 text-center app-card rounded-2xl opacity-60 text-xs">No active quests today. Launch one above!</div>`;
+        return;
+      }
+
+      container.innerHTML = today.map(t => {
+        const priorityColor = t.priority === 3 ? 'bg-red-500' : (t.priority === 2 ? 'bg-amber-400' : 'bg-blue-400');
+        return `
+          <div class="app-card rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-all hover:scale-[1.01] ${t.isCompleted ? 'opacity-50' : ''}">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-2.5 h-2.5 rounded-full ${priorityColor} shrink-0"></span>
+              <div class="min-w-0">
+                <h4 class="text-xs sm:text-sm font-semibold truncate ${t.isCompleted ? 'line-through text-white/60' : ''}">${t.title}</h4>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="text-[10px] text-amber-300 font-bold">+${t.xpReward} XP</span>
+                  <span class="text-[10px] opacity-50 font-mono">Priority ${t.priority}</span>
+                </div>
+              </div>
             </div>
+            <button onclick="toggleTaskComplete('${t.id}')" class="w-8 h-8 rounded-full border ${t.isCompleted ? 'accent-bg accent-border text-white' : 'border-white/20 hover:border-white/40'} flex items-center justify-center transition shrink-0">
+              ${t.isCompleted ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
+            </button>
           </div>
-          <button onclick="toggleTaskComplete('${t.id}')" class="w-8 h-8 rounded-full border ${t.isCompleted ? 'accent-bg accent-border text-white' : 'border-white/20 hover:border-white/40'} flex items-center justify-center transition shrink-0">
-            ${t.isCompleted ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
-          </button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
       lucide.createIcons();
     }
 
@@ -1048,7 +1266,7 @@
       if (!container) return;
 
       let filtered = localTasks;
-      if (activeFilter === 'today') filtered = localTasks.slice(0, 5);
+      if (activeFilter === 'today') filtered = localTasks.slice(0, 6);
       else if (activeFilter === 'completed') filtered = localTasks.filter(t => t.isCompleted);
       else if (activeFilter === 'pending') filtered = localTasks.filter(t => !t.isCompleted);
 
@@ -1057,25 +1275,29 @@
         return;
       }
 
-      container.innerHTML = filtered.map(t => `
-        <div class="app-card rounded-2xl p-4 flex items-center justify-between gap-4 transition hover:translate-x-1 ${t.isCompleted ? 'opacity-50' : ''}">
-          <div class="flex items-center gap-3.5 flex-1 min-w-0">
-            <button onclick="toggleTaskComplete('${t.id}')" class="w-6 h-6 rounded-lg border ${t.isCompleted ? 'accent-bg accent-border text-white' : 'border-white/20 hover:border-white/40'} flex items-center justify-center transition shrink-0">
-              ${t.isCompleted ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
-            </button>
-            <div class="min-w-0 flex-1">
-              <h4 class="text-sm font-semibold truncate ${t.isCompleted ? 'line-through opacity-70' : ''}">${t.title}</h4>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-[10px] font-bold text-amber-300">+${t.xpReward} XP</span>
-                <span class="text-[10px] opacity-60 font-mono">Priority ${t.priority}</span>
+      container.innerHTML = filtered.map(t => {
+        const priorityColor = t.priority === 3 ? 'bg-red-500' : (t.priority === 2 ? 'bg-amber-400' : 'bg-blue-400');
+        return `
+          <div class="app-card rounded-2xl p-4 flex items-center justify-between gap-4 transition hover:translate-x-1 ${t.isCompleted ? 'opacity-50' : ''}">
+            <div class="flex items-center gap-3.5 flex-1 min-w-0">
+              <button onclick="toggleTaskComplete('${t.id}')" class="w-6 h-6 rounded-lg border ${t.isCompleted ? 'accent-bg accent-border text-white' : 'border-white/20 hover:border-white/40'} flex items-center justify-center transition shrink-0">
+                ${t.isCompleted ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
+              </button>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-sm font-semibold truncate ${t.isCompleted ? 'line-through opacity-70' : ''}">${t.title}</h4>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="w-2 h-2 rounded-full ${priorityColor}"></span>
+                  <span class="text-[10px] font-bold text-amber-300">+${t.xpReward} XP</span>
+                  <span class="text-[10px] opacity-60 font-mono">Priority ${t.priority}</span>
+                </div>
               </div>
             </div>
+            <button onclick="deleteTaskItem('${t.id}')" class="p-1.5 opacity-30 hover:opacity-100 hover:text-red-400 transition" title="Delete quest">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
           </div>
-          <button onclick="deleteTaskItem('${t.id}')" class="p-1.5 opacity-30 hover:opacity-100 hover:text-red-400 transition" title="Delete quest">
-            <i data-lucide="trash-2" class="w-4 h-4"></i>
-          </button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
       lucide.createIcons();
     }
 
@@ -1098,7 +1320,7 @@
        SOLAR SYSTEM & SPACE CANVAS ANIMATIONS
        ══════════════════════════════════════════════════════════════════════ -->
   <script>
-    // ── 1. Starfield Background ──
+    // 1. Starfield Background
     const starCanvas = document.getElementById('spaceStarsCanvas');
     const sCtx = starCanvas.getContext('2d');
     let stars = [];
@@ -1107,14 +1329,14 @@
       starCanvas.width = window.innerWidth;
       starCanvas.height = window.innerHeight;
       stars = [];
-      const count = Math.floor((starCanvas.width * starCanvas.height) / 7000);
+      const count = Math.floor((starCanvas.width * starCanvas.height) / 7500);
       for (let i = 0; i < count; i++) {
         stars.push({
           x: Math.random() * starCanvas.width,
           y: Math.random() * starCanvas.height,
-          radius: Math.random() * 1.5 + 0.5,
+          radius: Math.random() * 1.4 + 0.4,
           alpha: Math.random() * 0.7 + 0.3,
-          delta: (Math.random() - 0.5) * 0.02
+          delta: (Math.random() - 0.5) * 0.015
         });
       }
     }
@@ -1135,7 +1357,7 @@
     }
     renderStarfield();
 
-    // ── 2. Interactive Solar System Canvas (DailySkyBackground Replica) ──
+    // 2. Solar System Canvas (DailySkyBackground Replica)
     const solarCanvas = document.getElementById('solarSystemCanvas');
     const sSysCtx = solarCanvas.getContext('2d');
     let sW, sH;
@@ -1151,11 +1373,11 @@
     setTimeout(resizeSolarCanvas, 100);
 
     let planets = [
-      { name: "Hermea", radius: 5, dist: 70, speed: 0.025, angle: 0, color: "#A8A29E" },
-      { name: "Cytherea", radius: 8, dist: 120, speed: 0.015, angle: 1.5, color: "#F59E0B" },
-      { name: "Terra Gaia", radius: 9, dist: 175, speed: 0.01, angle: 3.2, color: "#14B8A6" },
+      { name: "Hermea (Mercury)", radius: 5, dist: 65, speed: 0.024, angle: 0, color: "#A8A29E" },
+      { name: "Cytherea (Venus)", radius: 7.5, dist: 110, speed: 0.015, angle: 1.6, color: "#F59E0B" },
+      { name: "Terra Gaia (Earth)", radius: 9, dist: 160, speed: 0.01, angle: 3.4, color: "#14B8A6" },
+      { name: "Ares (Mars)", radius: 6.5, dist: 210, speed: 0.007, angle: 5.1, color: "#EF4444" }
     ];
-    let anomalyAngle = 4.2;
 
     function renderSolarSystem() {
       if (!sW) return requestAnimationFrame(renderSolarSystem);
@@ -1167,24 +1389,15 @@
       // Draw Orbit Rings
       for (let p of planets) {
         sSysCtx.beginPath();
-        sSysCtx.ellipse(cx, cy, p.dist, p.dist * 0.45, 0, 0, Math.PI * 2);
+        sSysCtx.ellipse(cx, cy, p.dist, p.dist * 0.44, 0, 0, Math.PI * 2);
         sSysCtx.strokeStyle = "rgba(255, 255, 255, 0.07)";
         sSysCtx.lineWidth = 1;
         sSysCtx.stroke();
       }
 
-      // Outer Void Rift Orbit
-      const riftDist = 225;
-      sSysCtx.beginPath();
-      sSysCtx.ellipse(cx, cy, riftDist, riftDist * 0.45, 0, 0, Math.PI * 2);
-      sSysCtx.strokeStyle = "rgba(168, 85, 247, 0.15)";
-      sSysCtx.setLineDash([4, 6]);
-      sSysCtx.stroke();
-      sSysCtx.setLineDash([]);
-
       // Draw Central Sun (Sol Primus) with Volumetric Corona
       const time = Date.now() * 0.002;
-      const sunRadius = 22 + Math.sin(time) * 1.5;
+      const sunRadius = 20 + Math.sin(time) * 1.5;
 
       const sunGrad = sSysCtx.createRadialGradient(cx, cy, 2, cx, cy, sunRadius * 2.8);
       sunGrad.addColorStop(0, "rgba(255, 245, 160, 1)");
@@ -1210,9 +1423,8 @@
       for (let p of planets) {
         p.angle += p.speed;
         const px = cx + Math.cos(p.angle) * p.dist;
-        const py = cy + Math.sin(p.angle) * (p.dist * 0.45);
+        const py = cy + Math.sin(p.angle) * (p.dist * 0.44);
 
-        // Planet body
         sSysCtx.beginPath();
         sSysCtx.arc(px, py, p.radius, 0, Math.PI * 2);
         sSysCtx.fillStyle = p.color;
@@ -1221,24 +1433,6 @@
         sSysCtx.fill();
         sSysCtx.shadowBlur = 0;
       }
-
-      // Draw Dimensional Void Rift Anomaly
-      anomalyAngle += 0.005;
-      const rx = cx + Math.cos(anomalyAngle) * riftDist;
-      const ry = cy + Math.sin(anomalyAngle) * (riftDist * 0.45);
-
-      // Black Hole Event Horizon
-      sSysCtx.beginPath();
-      sSysCtx.arc(rx, ry, 11, 0, Math.PI * 2);
-      sSysCtx.fillStyle = "#000000";
-      sSysCtx.fill();
-
-      // Accretion Disk Ring
-      sSysCtx.beginPath();
-      sSysCtx.ellipse(rx, ry, 16, 6, time, 0, Math.PI * 2);
-      sSysCtx.strokeStyle = "rgba(168, 85, 247, 0.8)";
-      sSysCtx.lineWidth = 2.5;
-      sSysCtx.stroke();
 
       requestAnimationFrame(renderSolarSystem);
     }
@@ -1253,7 +1447,7 @@
     const slCtx = slingCanvas.getContext('2d');
     let slW, slH;
 
-    let boss = { x: 0, y: 110, hp: 600, maxHp: 600, radius: 45, hitAnim: 0 };
+    let boss = { x: 0, y: 100, hp: 750, maxHp: 750, radius: 46, hitAnim: 0 };
     let slingshot = { x: 0, y: 0 };
     let meteor = { x: 0, y: 0, vx: 0, vy: 0, radius: 14, inFlight: false, dragging: false };
     let particles = [];
@@ -1270,7 +1464,7 @@
 
       boss.x = slW / 2;
       slingshot.x = slW / 2;
-      slingshot.y = slH - 80;
+      slingshot.y = slH - 75;
 
       if (!meteor.inFlight) {
         meteor.x = slingshot.x;
@@ -1278,7 +1472,6 @@
       }
     }
 
-    // Slingshot drag controls
     function getPointerPos(e) {
       const rect = slingCanvas.getBoundingClientRect();
       const clientX = e.clientX || (e.touches && e.touches[0].clientX);
@@ -1329,7 +1522,6 @@
       const pullDist = Math.hypot(dx, dy);
 
       if (pullDist > 15) {
-        // Fire meteor!
         meteor.inFlight = true;
         meteor.vx = dx * 0.22;
         meteor.vy = dy * 0.22;
@@ -1343,21 +1535,10 @@
       if (!slW) return requestAnimationFrame(loopSling);
       slCtx.clearRect(0, 0, slW, slH);
 
-      // Draw Arena Background Grid
-      slCtx.strokeStyle = "rgba(124, 77, 255, 0.08)";
-      slCtx.lineWidth = 1;
-      for (let x = 0; x < slW; x += 40) {
-        slCtx.beginPath();
-        slCtx.moveTo(x, 0);
-        slCtx.lineTo(x, slH);
-        slCtx.stroke();
-      }
-
-      // Draw Slingshot Pylons & Elastic Band
+      // Slingshot Pylons & Elastic Band
       const pylonLeft = { x: slingshot.x - 45, y: slingshot.y - 10 };
       const pylonRight = { x: slingshot.x + 45, y: slingshot.y - 10 };
 
-      // Left Elastic Band
       slCtx.beginPath();
       slCtx.moveTo(pylonLeft.x, pylonLeft.y);
       slCtx.lineTo(meteor.x, meteor.y);
@@ -1365,25 +1546,24 @@
       slCtx.lineWidth = 4;
       slCtx.stroke();
 
-      // Right Elastic Band
       slCtx.beginPath();
       slCtx.moveTo(pylonRight.x, pylonRight.y);
       slCtx.lineTo(meteor.x, meteor.y);
       slCtx.stroke();
 
-      // Draw Twin Pylons
+      // Pylons
       slCtx.fillStyle = "#4B5563";
       slCtx.fillRect(pylonLeft.x - 5, pylonLeft.y, 10, 40);
       slCtx.fillRect(pylonRight.x - 5, pylonRight.y, 10, 40);
 
-      // Pylon Energy Nodes
+      // Nodes
       slCtx.beginPath();
       slCtx.arc(pylonLeft.x, pylonLeft.y, 8, 0, Math.PI * 2);
       slCtx.arc(pylonRight.x, pylonRight.y, 8, 0, Math.PI * 2);
       slCtx.fillStyle = "#A855F7";
       slCtx.fill();
 
-      // Trajectory Guide Dots when dragging
+      // Trajectory guide
       if (meteor.dragging) {
         const dx = slingshot.x - meteor.x;
         const dy = slingshot.y - meteor.y;
@@ -1397,17 +1577,15 @@
         }
       }
 
-      // Draw Boss Sprite
+      // Boss
       boss.hitAnim = Math.max(0, boss.hitAnim - 0.05);
       const bColor = boss.hitAnim > 0 ? "#EF4444" : "#7C3AED";
 
-      // Boss Aura Prominence
       slCtx.beginPath();
-      slCtx.arc(boss.x, boss.y, boss.radius + 12 + Math.sin(Date.now() * 0.005) * 4, 0, Math.PI * 2);
+      slCtx.arc(boss.x, boss.y, boss.radius + 10 + Math.sin(Date.now() * 0.005) * 4, 0, Math.PI * 2);
       slCtx.fillStyle = "rgba(124, 58, 237, 0.25)";
       slCtx.fill();
 
-      // Boss Body
       slCtx.beginPath();
       slCtx.arc(boss.x, boss.y, boss.radius, 0, Math.PI * 2);
       slCtx.fillStyle = bColor;
@@ -1416,19 +1594,18 @@
       slCtx.fill();
       slCtx.shadowBlur = 0;
 
-      // Boss Face / Glowing Eyes
+      // Boss Eyes
       slCtx.fillStyle = "#F59E0B";
       slCtx.beginPath();
       slCtx.arc(boss.x - 14, boss.y - 6, 6, 0, Math.PI * 2);
       slCtx.arc(boss.x + 14, boss.y - 6, 6, 0, Math.PI * 2);
       slCtx.fill();
 
-      // In-flight Meteor Physics
+      // Physics
       if (meteor.inFlight) {
         meteor.x += meteor.vx;
         meteor.y += meteor.vy;
 
-        // Cometary wake particles
         particles.push({
           x: meteor.x,
           y: meteor.y,
@@ -1439,12 +1616,11 @@
           color: Math.random() > 0.5 ? "#F59E0B" : "#EC4899"
         });
 
-        // Collision Check with Boss
+        // Collision Check
         const d = Math.hypot(meteor.x - boss.x, meteor.y - boss.y);
         if (d < boss.radius + meteor.radius) {
-          // HIT!
           boss.hitAnim = 1;
-          const dmg = Math.floor(Math.random() * 40 + 60);
+          const dmg = Math.floor(Math.random() * 45 + 65);
           boss.hp = Math.max(0, boss.hp - dmg);
           hits++;
           totalDmg += dmg;
@@ -1452,13 +1628,11 @@
           document.getElementById('bossHitCount').textContent = hits;
           document.getElementById('bossDamageTotal').textContent = totalDmg;
 
-          // Update main boss HP bar
           const pct = Math.floor((boss.hp / boss.maxHp) * 100);
           document.getElementById('bossHpText').textContent = `${boss.hp} / ${boss.maxHp} HP`;
           document.getElementById('bossPercentText').textContent = `${pct}%`;
           document.getElementById('bossHpBar').style.width = `${pct}%`;
 
-          // Damage Popup Number
           damageNumbers.push({
             x: boss.x + (Math.random() - 0.5) * 30,
             y: boss.y - 20,
@@ -1466,26 +1640,23 @@
             alpha: 1
           });
 
-          // Impact Explosion Sparks
-          for (let i = 0; i < 25; i++) {
+          for (let i = 0; i < 20; i++) {
             particles.push({
               x: boss.x,
               y: boss.y,
-              vx: (Math.random() - 0.5) * 9,
-              vy: (Math.random() - 0.5) * 9,
-              radius: Math.random() * 5 + 2,
+              vx: (Math.random() - 0.5) * 8,
+              vy: (Math.random() - 0.5) * 8,
+              radius: Math.random() * 4 + 2,
               life: 1,
               color: "#FBBF24"
             });
           }
 
-          // Reset meteor
           meteor.inFlight = false;
           meteor.x = slingshot.x;
           meteor.y = slingshot.y;
         }
 
-        // Off screen boundary reset
         if (meteor.y < -50 || meteor.x < -50 || meteor.x > slW + 50) {
           meteor.inFlight = false;
           meteor.x = slingshot.x;
@@ -1511,7 +1682,7 @@
         slCtx.globalAlpha = 1;
       }
 
-      // Draw Damage Numerals
+      // Damage Numerals
       for (let i = damageNumbers.length - 1; i >= 0; i--) {
         const dn = damageNumbers[i];
         dn.y -= 1.2;
@@ -1525,7 +1696,7 @@
         slCtx.fillText(dn.text, dn.x, dn.y);
       }
 
-      // Draw Meteor
+      // Meteor
       slCtx.beginPath();
       slCtx.arc(meteor.x, meteor.y, meteor.radius, 0, Math.PI * 2);
       slCtx.fillStyle = "#F59E0B";
@@ -1548,15 +1719,36 @@
   </script>
 
   <!-- ══════════════════════════════════════════════════════════════════════
-       VIEW SWITCHER & MODAL LOGIC
+       VIEW SWITCHER, MODAL LOGIC & TIME GREETING
        ══════════════════════════════════════════════════════════════════════ -->
   <script>
+    // Dynamic Time-of-Day Greeting matching Android
+    function updateGreeting() {
+      const h = new Date().getHours();
+      let greeting = "Good Evening, Explorer";
+      let quote = "Finish strong. One more task can change your universe.";
+
+      if (h >= 5 && h < 12) {
+        greeting = "Good Morning, Explorer";
+        quote = "A new day. A new universe to build.";
+      } else if (h >= 12 && h < 17) {
+        greeting = "Good Afternoon, Explorer";
+        quote = "Keep your momentum. Every task lights another star.";
+      }
+
+      const gEl = document.getElementById('homeGreetingText');
+      const qEl = document.getElementById('homeQuoteText');
+      if (gEl) gEl.textContent = greeting;
+      if (qEl) qEl.textContent = quote;
+    }
+    updateGreeting();
+
     window.switchScreen = (screenName) => {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.add('hidden'));
       const target = document.getElementById('screen-' + screenName);
       if (target) target.classList.remove('hidden');
 
-      // Update Nav active styling
+      // Update Desktop Nav
       ['home', 'tasks', 'cosmos', 'skills', 'profile'].forEach(name => {
         const btn = document.getElementById('nav-btn-' + name);
         if (btn) {
@@ -1572,6 +1764,16 @@
             if (span) span.className = "text-[11px] font-medium tracking-wide text-white/70";
           }
         }
+
+        // Update Mobile Bottom Nav
+        const mobBtn = document.getElementById('mob-btn-' + name);
+        if (mobBtn) {
+          if (name === screenName) {
+            mobBtn.className = "flex flex-col items-center gap-0.5 text-purple-300";
+          } else {
+            mobBtn.className = "flex flex-col items-center gap-0.5 opacity-60";
+          }
+        }
       });
       lucide.createIcons();
     };
@@ -1579,7 +1781,6 @@
     window.setTheme = (themeName) => {
       document.body.className = `theme-${themeName} min-h-screen flex flex-col md:flex-row antialiased selection:bg-purple-600 selection:text-white`;
 
-      // Update checks
       ['cosmic', 'material', 'slate'].forEach(t => {
         const check = document.getElementById('check-' + t);
         const card = document.getElementById('card-' + t);
@@ -1615,10 +1816,10 @@
       closeCreateTaskModal();
     };
 
-    window.createQuestDirect = () => {
-      const input = document.getElementById('questInput');
+    window.createHomeQuestDirect = () => {
+      const input = document.getElementById('homeQuestInput');
       const title = input.value.trim();
-      const priority = document.getElementById('questPriority').value;
+      const priority = document.getElementById('homeQuestPriority').value;
       if (!title) return;
       window.createNewQuest(title, priority);
       input.value = '';
@@ -1626,6 +1827,13 @@
 
     window.openSyncModal = () => document.getElementById('syncModal').classList.remove('hidden');
     window.closeSyncModal = () => document.getElementById('syncModal').classList.add('hidden');
+
+    window.triggerOracleModal = () => document.getElementById('oracleModal').classList.remove('hidden');
+    window.closeOracleModal = () => document.getElementById('oracleModal').classList.add('hidden');
+
+    window.toggleSpaceView = () => {
+      window.showToast("Orbiting Sol Primus: 4 active celestial bodies.", "info");
+    };
 
     lucide.createIcons();
   </script>
